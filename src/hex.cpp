@@ -12,6 +12,7 @@ std::string encoding::HexString::to_base64() {
   std::string result;
   result.reserve(hex_bytes_.size() / 3 * 4 + 4);
   
+  /* 3 octets as each octet stores 2 hex characters(4 bit) and 6 are needed for even encoding */
   uint8_t octets[3];
   
   for (decltype(hex_bytes_.size()) i = 0; i + 2 < hex_bytes_.size(); i += 3) {
@@ -19,6 +20,13 @@ std::string encoding::HexString::to_base64() {
     octets[1] = hex_bytes_.at(i+1);
     octets[2] = hex_bytes_.at(i+2);
     
+    /*
+     *  Hex characters are 4 bits while base64 encoded character are 6 bits
+     *  For every 6 hex there are 4 base64 encoded:
+     *
+     *  aaaa bbbb cccc  dddd eeee ffff
+     *  aaaabb  bbcccc  ddddee  eeffff
+     */
     result.push_back( base64_chars[ octets[0] >> 2 ] );
     result.push_back( base64_chars[ ((octets[0] & 0x3) << 4) + (octets[1] >> 4) ] );
     result.push_back( base64_chars[ ((octets[1] & 0xf) << 2) + (octets[2] >> 6) ] );

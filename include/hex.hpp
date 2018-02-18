@@ -15,6 +15,8 @@ namespace encoding {
       HexString (std::string);
       std::string to_base64();
       std::string print();
+      std::vector<uint8_t> print_bytes();
+      encoding::HexString even_xor(HexString);
   };
   
 }

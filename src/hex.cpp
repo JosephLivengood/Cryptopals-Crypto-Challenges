@@ -1,4 +1,6 @@
 #include <hex.hpp>
+#include <iostream>
+#include <functional>
 #include <stdexcept>
 
 encoding::HexString::HexString(std::string hex) {
@@ -58,6 +60,34 @@ std::string encoding::HexString::to_base64() {
 
 std::string encoding::HexString::print() {
   return hex_;
+}
+
+std::vector<uint8_t> encoding::HexString::print_bytes() {
+  return hex_bytes_;
+}
+
+encoding::HexString encoding::HexString::even_xor(encoding::HexString against) {
+  if (hex_bytes_.size() != against.print_bytes().size()) {
+    std::cout << "uneven inputs" << std::endl;
+    throw std::invalid_argument("uneven inputs");
+  }
+  
+  std::vector<uint8_t> result_bytes;
+  for (int i = 0; i < hex_bytes_.size(); i++) {
+    uint8_t temp = hex_bytes_[i] ^ against.print_bytes()[i];
+    result_bytes.push_back(temp);
+  }
+  
+  std::string result_string;
+  for (int i = 0; i < result_bytes.size(); i++) {
+    auto t1 = result_bytes[i] >> 4;
+    auto t2 = result_bytes[i] & 0xf;
+    result_string.push_back(hex_chars[t1 % 16]);
+    result_string.push_back(hex_chars[t2 % 16]);
+  }
+  
+  encoding::HexString result { result_string };
+  return result;
 }
 
 uint8_t pair_to_byte(const char a, const char b) {
